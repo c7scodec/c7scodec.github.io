@@ -274,16 +274,42 @@ function draw(){
 }
 draw();
 
-function handleNotify(){
+async function handleNotify(){
   const inp=document.getElementById('emailInput'),msg=document.getElementById('notifyMsg');
-  const v=inp.value.trim();
-  if(!v||!v.includes('@')){msg.style.color='rgba(200,16,46,.75)';msg.textContent='Geçerli bir e-posta adresi girin.';msg.style.opacity=1;return}
-  inp.disabled=true;
   const btn=document.querySelector('.notify-btn');
-  btn.disabled=true;btn.textContent='✓';btn.style.background='#1d6a3e';
-  msg.style.color='rgba(255,255,255,.35)';msg.textContent='Hazır olduğunda sizi bilgilendireceğiz.';msg.style.opacity=1;
+  const v=inp.value.trim();
+  if(!v||!v.includes('@')){
+    msg.style.color='rgba(200,16,46,.75)';
+    msg.textContent='Geçerli bir e-posta adresi girin.';
+    msg.style.opacity=1;
+    return;
+  }
+  // Loading state
+  btn.disabled=true;inp.disabled=true;
+  btn.textContent='...';
+  try{
+    const res=await fetch('https://formspree.io/f/xwvjergj',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({email:v,_subject:'Aeromek — Haber Al Talebi'})
+    });
+    if(res.ok){
+      btn.textContent='✓';btn.style.background='#1d6a3e';
+      msg.style.color='rgba(255,255,255,.35)';
+      msg.textContent='Kayıt alındı. Hazır olduğunda sizi bilgilendireceğiz.';
+      msg.style.opacity=1;
+    } else {
+      throw new Error('server');
+    }
+  } catch(e){
+    btn.disabled=false;inp.disabled=false;
+    btn.textContent='Haber Ver';btn.style.background='';
+    msg.style.color='rgba(200,16,46,.75)';
+    msg.textContent='Bir hata oluştu, lütfen tekrar deneyin.';
+    msg.style.opacity=1;
+  }
 }
-document.getElementById('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleNotify()});
+document.getElementById('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleNotify();});
 </script>
 </body>
 </html>
