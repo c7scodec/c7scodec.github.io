@@ -60,7 +60,8 @@ if (lb && lb.showModal) {
   lb.addEventListener('click', e => { if (e.target !== lbImg) lb.close(); });
 }
 
-// Teklif formu: Netlify Forms'a kaydeder + WhatsApp mesajını açar
+// Teklif formu: WhatsApp mesajını açar; site Netlify'daysa ayrıca Netlify Forms'a kaydeder
+const NETLIFY = location.hostname.endsWith('aeromek.net') || location.hostname.endsWith('netlify.app');
 $('contactForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const form = e.target, note = $('formNote'), btn = form.querySelector('button[type=submit]');
@@ -82,6 +83,17 @@ $('contactForm').addEventListener('submit', (e) => {
   // WhatsApp tıklama anında açılmalı (sonradan açılırsa tarayıcı engeller)
   window.open('https://wa.me/905543349600?text=' + encodeURIComponent(lines), '_blank', 'noopener');
 
+  if (typeof gtag === 'function') gtag('event', 'generate_lead', { form: 'teklif' });
+
+  // Netlify Forms yalnızca Netlify'da çalışır; GitHub Pages'te talep WhatsApp ile iletilir
+  if (!NETLIFY) {
+    note.className = 'form-note ok';
+    note.textContent = 'Talebiniz hazırlandı (' + no + '). Açılan WhatsApp penceresinde mesajı gönderin; aynı gün içinde dönüş yapacağız.';
+    form.reset();
+    $('qty').value = '1';
+    return;
+  }
+
   btn.disabled = true;
   note.className = 'form-note';
   note.textContent = 'Gönderiliyor…';
@@ -95,7 +107,6 @@ $('contactForm').addEventListener('submit', (e) => {
     note.textContent = 'Talebiniz alındı (' + no + '). Aynı gün içinde size dönüş yapacağız. WhatsApp penceresinde mesajı göndererek süreci hızlandırabilirsiniz.';
     form.reset();
     $('qty').value = '1';
-    if (typeof gtag === 'function') gtag('event', 'generate_lead', { form: 'teklif' });
   }).catch(() => {
     note.className = 'form-note err';
     note.textContent = 'Form kaydedilemedi. Lütfen açılan WhatsApp penceresinden mesajı gönderin ya da 0554 334 96 00 numarasını arayın.';

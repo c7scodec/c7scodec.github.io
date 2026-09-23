@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aeromek.net/sitemap.xml
+Sitemap: https://aeromek.com.tr/sitemap.xml
