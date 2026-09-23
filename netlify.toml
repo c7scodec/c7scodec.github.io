@@ -1,0 +1,24 @@
+# Netlify ayarları — yayın klasörü bu klasörün kendisi
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Görseller ve video: 30 gün önbellek
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# www → çıplak alan adı
+[[redirects]]
+  from = "https://www.aeromek.net/*"
+  to = "https://aeromek.net/:splat"
+  status = 301
+  force = true
